@@ -40,7 +40,11 @@ public class Window {
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
         glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
         glfwWindow = glfwCreateWindow(this.width, this.height, this.title, NULL, NULL);
-
+        if (glfwWindow == NULL) {
+            throw new IllegalStateException("FAILED TO CREATE GLFW WINDOW");
+        }
+        glfwMakeContextCurrent(glfwWindow);
+        glfwSwapInterval(1);
     }
 
     public void loop() {
