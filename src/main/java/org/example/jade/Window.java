@@ -45,6 +45,7 @@ public class Window {
         }
         glfwMakeContextCurrent(glfwWindow);
         glfwSwapInterval(1);
+        //push
     }
 
     public void loop() {
