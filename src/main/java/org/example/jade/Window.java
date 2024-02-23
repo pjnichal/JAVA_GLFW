@@ -3,20 +3,27 @@ package org.example.jade;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
 
+import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 public class Window {
     private static Window window = null;
+
     private int width, height;
     private String title;
     private long glfwWindow;
+    private float r, g, b, a;
 
     private Window() {
         this.width = 1920;
         this.height = 1080;
         this.title = "Mario";
+        r = 1;
+        g = 1;
+        b = 1;
+        a = 1;
     }
 
     public static Window get() {
@@ -30,6 +37,10 @@ public class Window {
         System.out.println("Hello LWJGL");
         init();
         loop();
+        glfwFreeCallbacks(glfwWindow);
+        glfwDestroyWindow(glfwWindow);
+        glfwTerminate();
+        glfwSetErrorCallback(null).free();
     }
 
     public void init() {
@@ -45,6 +56,11 @@ public class Window {
         if (glfwWindow == NULL) {
             throw new IllegalStateException("FAILED TO CREATE GLFW WINDOW");
         }
+        
+        glfwSetCursorPosCallback(glfwWindow, MouseListener::mousePosCallback);
+        glfwSetMouseButtonCallback(glfwWindow, MouseListener::mouseButtonCallback);
+        glfwSetScrollCallback(glfwWindow, MouseListener::mouseScrollCallback);
+        glfwSetKeyCallback(glfwWindow, KeyListener::keyCallback);
         glfwMakeContextCurrent(glfwWindow);
         glfwSwapInterval(1);
         glfwShowWindow(glfwWindow);
@@ -54,8 +70,11 @@ public class Window {
     public void loop() {
         while (!glfwWindowShouldClose(glfwWindow)) {
             glfwPollEvents();
-            glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
+            glClearColor(r, g, b, a);
             glClear(GL_COLOR_BUFFER_BIT);
+            if (KeyListener.isKeyPressed(GLFW_KEY_SPACE)) {
+
+            }
             glfwSwapBuffers(glfwWindow);
         }
     }
