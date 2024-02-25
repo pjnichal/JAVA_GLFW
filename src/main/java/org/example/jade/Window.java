@@ -1,5 +1,6 @@
 package org.example.jade;
 
+import org.example.util.Time;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
 
@@ -10,20 +11,36 @@ import static org.lwjgl.system.MemoryUtil.NULL;
 
 public class Window {
     private static Window window = null;
+    private static Scene currScene = null;
+    public float r, g, b, a;
 
     private int width, height;
     private String title;
     private long glfwWindow;
-    private float r, g, b, a;
 
     private Window() {
         this.width = 1920;
         this.height = 1080;
         this.title = "Mario";
-        r = 1;
-        g = 1;
-        b = 1;
-        a = 1;
+        this.r = 1;
+        this.g = 1;
+        this.b = 1;
+        this.a = 1;
+    }
+
+    public static void changeScene(int newScene) {
+        switch (newScene) {
+            case 0:
+                currScene = new LevelEditorScene();
+                currScene.init();
+                break;
+            case 1:
+                currScene = new LevelScene();
+                currScene.init();
+                break;
+            default:
+                assert false : "Unknow Scene" + newScene;
+        }
     }
 
     public static Window get() {
@@ -56,7 +73,7 @@ public class Window {
         if (glfwWindow == NULL) {
             throw new IllegalStateException("FAILED TO CREATE GLFW WINDOW");
         }
-        
+
         glfwSetCursorPosCallback(glfwWindow, MouseListener::mousePosCallback);
         glfwSetMouseButtonCallback(glfwWindow, MouseListener::mouseButtonCallback);
         glfwSetScrollCallback(glfwWindow, MouseListener::mouseScrollCallback);
@@ -65,17 +82,25 @@ public class Window {
         glfwSwapInterval(1);
         glfwShowWindow(glfwWindow);
         GL.createCapabilities();
+        Window.changeScene(0);
     }
 
     public void loop() {
+        float beginTime = Time.getTime();
+        float endTime;
+        float dt = -1.0f;
         while (!glfwWindowShouldClose(glfwWindow)) {
             glfwPollEvents();
             glClearColor(r, g, b, a);
             glClear(GL_COLOR_BUFFER_BIT);
-            if (KeyListener.isKeyPressed(GLFW_KEY_SPACE)) {
-
+            if (dt >= 0) {
+                currScene.update(dt);
             }
+
             glfwSwapBuffers(glfwWindow);
+            endTime = Time.getTime();
+            dt = endTime - beginTime;
+            beginTime = endTime;
         }
     }
 }
